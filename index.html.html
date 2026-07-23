@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuranyEnseña - Chatbot Educativo e Interactivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        jurany: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f472b6',
+                            400: '#e879f9',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Fredoka', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+        .chat-bubble-jurany {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+            border: 1px solid #fbcfe8;
+        }
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 flex flex-col antialiased selection:bg-jurany-200 selection:text-jurany-900">
+
+    <!-- Application Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('chat')">
+                <div class="relative w-12 h-12 bg-jurany-100 rounded-2xl flex items-center justify-center p-1 border-2 border-jurany-300 shadow-inner group transition-transform hover:scale-105">
+                    <!-- SVG Pink T-Rex Icon -->
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm">
+                        <!-- T-Rex Body -->
+                        <path d="M 30,85 C 25,85 20,75 25,65 C 22,55 25,40 35,30 C 40,25 50,20 65,20 C 75,20 85,25 85,32 C 85,38 78,42 72,42 C 68,42 65,40 60,40 C 58,45 60,52 65,58 C 70,62 72,70 65,78 C 55,88 40,85 30,85 Z" fill="#ec4899"/>
+                        <!-- Belly Accent -->
+                        <path d="M 35,60 C 32,50 38,38 48,30 C 45,45 42,65 38,75 C 35,72 34,65 35,60 Z" fill="#fbcfe8"/>
+                        <!-- Head / Snout -->
+                        <path d="M 55,20 C 60,12 75,12 85,18 C 90,22 88,32 82,34 C 75,36 68,30 65,30 C 60,30 58,25 55,20 Z" fill="#db2777"/>
+                        <!-- Cute Eye -->
+                        <circle cx="70" cy="22" r="3.5" fill="#1e293b"/>
+                        <circle cx="71" cy="21" r="1.2" fill="#ffffff"/>
+                        <!-- Cute Glasses (Teacher Vibe) -->
+                        <circle cx="70" cy="22" r="5" stroke="#facc15" stroke-width="1.5" fill="none"/>
+                        <line x1="75" y1="22" x2="80" y2="22" stroke="#facc15" stroke-width="1.5"/>
+                        <!-- Little T-Rex Arm holding a tiny book/pencil -->
+                        <path d="M 52,48 C 58,48 62,50 64,53" stroke="#be185d" stroke-width="3" stroke-linecap="round" fill="none"/>
+                        <!-- Sharp Teeth / Smile -->
+                        <path d="M 72,32 L 74,35 L 76,32 L 78,35 L 80,32" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+                        <!-- Tail -->
+                        <path d="M 30,75 C 18,78 10,72 5,68 C 10,78 20,85 28,83 Z" fill="#db2777"/>
+                        <!-- Feet -->
+                        <path d="M 38,83 L 35,92 L 42,92 Z" fill="#be185d"/>
+                        <path d="M 52,82 L 50,92 L 57,92 Z" fill="#be185d"/>
+                    </svg>
+                    <!-- Pulse online indicator -->
+                    <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-2xl text-slate-900 leading-none tracking-wide flex items-center gap-1.5">
+                        Jurany<span class="text-jurany-600">Enseña</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Tu Tutora Dinosauria Inteligente 🦖✨</p>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Tabs -->
+            <nav class="hidden md:flex items-center space-x-1 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                <button id="nav-chat" onclick="switchTab('chat')" class="tab-btn active-tab px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-jurany-500"></i> Chat
+                </button>
+                <button id="nav-menu" onclick="switchTab('menu')" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-slate-900 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-shapes text-purple-500"></i> Menú de Temas
+                </button>
+                <button id="nav-data" onclick="switchTab('data')" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-slate-900 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-user text-amber-500"></i> Registro y Datos
+                </button>
+                <button id="nav-qr" onclick="switchTab('qr')" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-slate-900 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-emerald-500"></i> Código QR
+                </button>
+                <button id="nav-help" onclick="switchTab('help')" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-slate-900 transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-blue-500"></i> Ayuda
+                </button>
+            </nav>
+
+            <!-- Quick Action / Status -->
+            <div class="flex items-center space-x-3">
+                <button onclick="clearChatLog()" class="p-2 text-slate-400 hover:text-jurany-600 hover:bg-jurany-50 rounded-xl transition" title="Limpiar conversación">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <div class="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs px-3 py-1.5 rounded-full font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    Gemini AI Activo
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="md:hidden bg-white border-b border-slate-200 px-2 py-2 flex justify-around text-xs font-medium text-slate-600">
+        <button onclick="switchTab('chat')" class="mobile-tab-btn flex flex-col items-center gap-1 p-2 text-jurany-600 font-semibold" id="mob-chat">
+            <i class="fa-solid fa-comments text-base"></i> Chat
+        </button>
+        <button onclick="switchTab('menu')" class="mobile-tab-btn flex flex-col items-center gap-1 p-2" id="mob-menu">
+            <i class="fa-solid fa-shapes text-base"></i> Menú
+        </button>
+        <button onclick="switchTab('data')" class="mobile-tab-btn flex flex-col items-center gap-1 p-2" id="mob-data">
+            <i class="fa-solid fa-clipboard-user text-base"></i> Datos
+        </button>
+        <button onclick="switchTab('qr')" class="mobile-tab-btn flex flex-col items-center gap-1 p-2" id="mob-qr">
+            <i class="fa-solid fa-qrcode text-base"></i> QR
+        </button>
+        <button onclick="switchTab('help')" class="mobile-tab-btn flex flex-col items-center gap-1 p-2" id="mob-help">
+            <i class="fa-solid fa-circle-question text-base"></i> Ayuda
+        </button>
+    </div>
+
+    <!-- Main Application Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-0">
+
+        <!-- TAB 1: CHATBOT VIEWPORT -->
+        <section id="view-chat" class="tab-content flex-1 flex flex-col bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[550px]">
+            <!-- Chat Info Header -->
+            <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-jurany-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Sesión de Aprendizaje con Jurany</span>
+                </div>
+                <div class="text-xs text-slate-400">
+                    <i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Respuesta Instantánea
+                </div>
+            </div>
+
+            <!-- Quick Topics Carousel -->
+            <div class="bg-jurany-50/50 border-b border-jurany-100 p-3 overflow-x-auto flex items-center space-x-2 custom-scrollbar">
+                <span class="text-xs font-semibold text-jurany-800 whitespace-nowrap px-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencias:</span>
+                <button onclick="sendQuickPrompt('¡Hola Jurany! Cuéntame sobre ti y cómo puedes enseñarme hoy.')" class="bg-white hover:bg-jurany-100 text-jurany-700 text-xs px-3 py-1.5 rounded-full border border-jurany-200 whitespace-nowrap shadow-xs transition">
+                    👋 ¿Quién es Jurany?
+                </button>
+                <button onclick="sendQuickPrompt('Explicame el proceso de la fotosíntesis de forma sencilla y divertida.')" class="bg-white hover:bg-jurany-100 text-jurany-700 text-xs px-3 py-1.5 rounded-full border border-jurany-200 whitespace-nowrap shadow-xs transition">
+                    🌱 Fotosíntesis Fácil
+                </button>
+                <button onclick="sendQuickPrompt('Dame 3 trucos de matemáticas para multiplicar más rápido.')" class="bg-white hover:bg-jurany-100 text-jurany-700 text-xs px-3 py-1.5 rounded-full border border-jurany-200 whitespace-nowrap shadow-xs transition">
+                    🔢 Trucos Matemáticos
+                </button>
+                <button onclick="sendQuickPrompt('¿Cuáles son los hábitos más efectivos para estudiar antes de un examen?')" class="bg-white hover:bg-jurany-100 text-jurany-700 text-xs px-3 py-1.5 rounded-full border border-jurany-200 whitespace-nowrap shadow-xs transition">
+                    📚 Tips de Estudio
+                </button>
+                <button onclick="sendQuickPrompt('Hazme un mini quiz de 3 preguntas de historia general.')" class="bg-white hover:bg-jurany-100 text-jurany-700 text-xs px-3 py-1.5 rounded-full border border-jurany-200 whitespace-nowrap shadow-xs transition">
+                    🧠 Mini Quiz de Historia
+                </button>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div id="chat-messages" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 custom-scrollbar bg-gradient-to-b from-white to-slate-50/50">
+                <!-- Welcome Message from Jurany -->
+                <div class="flex items-start gap-3 max-w-3xl">
+                    <div class="w-10 h-10 rounded-2xl bg-jurany-500 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0 border-2 border-white">
+                        🦖
+                    </div>
+                    <div class="chat-bubble-jurany rounded-2xl rounded-tl-none p-4 shadow-xs text-slate-800 space-y-2">
+                        <div class="flex items-center justify-between border-b border-jurany-200/60 pb-1">
+                            <span class="font-display font-bold text-jurany-700 text-sm">Jurany La T-Rex</span>
+                            <span class="text-[10px] text-jurany-500 font-medium">Ahora</span>
+                        </div>
+                        <p class="text-sm leading-relaxed">
+                            ¡RAAWR! 🦖✨ ¡Hola! Soy <strong>Jurany</strong>, tu profesora T-Rex rosa. Estoy aquí para hacer que aprender cualquier materia sea súper divertido, fácil y rápido.
+                        </p>
+                        <p class="text-sm leading-relaxed">
+                            Puedes preguntarme sobre <strong>Matemáticas, Ciencias, Lengua, Historia</strong> o pedirme un resumen o quiz. ¿Qué te gustaría aprender hoy?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div id="typing-indicator" class="hidden px-6 py-2 text-xs text-slate-400 flex items-center gap-2">
+                <div class="w-7 h-7 rounded-xl bg-jurany-100 flex items-center justify-center text-sm">🦖</div>
+                <span class="font-medium text-jurany-600">Jurany está pensando la respuesta...</span>
+                <div class="flex space-x-1">
+                    <div class="w-1.5 h-1.5 bg-jurany-400 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-jurany-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    <div class="w-1.5 h-1.5 bg-jurany-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                </div>
+            </div>
+
+            <!-- Input Box -->
+            <div class="p-4 bg-white border-t border-slate-200">
+                <form id="chat-form" onsubmit="handleSendMessage(event)" class="flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" id="user-input" placeholder="Escribe tu duda o tema aquí (ej: 'Explícame las fracciones')..." 
+                            class="w-full bg-slate-100 border border-slate-200 rounded-2xl px-5 py-3.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-jurany-400 focus:bg-white transition"
+                            autocomplete="off">
+                        <button type="button" onclick="toggleVoiceInput()" id="mic-btn" title="Dictar por voz" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-jurany-600 p-1">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                    </div>
+                    <button type="submit" id="send-btn" class="bg-jurany-500 hover:bg-jurany-600 text-white px-5 py-3.5 rounded-2xl font-semibold shadow-md shadow-jurany-200 hover:shadow-lg transition flex items-center gap-2 text-sm shrink-0">
+                        <span>Enviar</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 2: TEMAS Y MENÚ DE OPCIONES -->
+        <section id="view-menu" class="tab-content hidden flex-1 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes text-purple-500"></i> Menú de Temas Educativos
+                    </h2>
+                    <p class="text-slate-500 text-sm">Selecciona una categoría para que Jurany prepare una lección guiada instantánea.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Category Card 1 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-pink-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Matemáticas Divertidas</h3>
+                            <p class="text-xs text-slate-500 mt-1">Álgebra, geometría, fracciones y resolución de problemas paso a paso.</p>
+                        </div>
+                        <button onclick="startCategorySession('Matemáticas Divertidas', 'Quiero aprender matemáticas. Dame un tema clave explicado fácilmente con un ejemplo práctico.')" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Explorar Matemáticas
+                        </button>
+                    </div>
+
+                    <!-- Category Card 2 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-emerald-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-flask"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Ciencias y Naturaleza</h3>
+                            <p class="text-xs text-slate-500 mt-1">Biología, cuerpo humano, química básica, dinosaurios y universo.</p>
+                        </div>
+                        <button onclick="startCategorySession('Ciencias', 'Enséñame un dato científico fascinante sobre el universo o la biología y explícamelo.')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Explorar Ciencias
+                        </button>
+                    </div>
+
+                    <!-- Category Card 3 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-blue-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Lengua y Ortografía</h3>
+                            <p class="text-xs text-slate-500 mt-1">Reglas ortográficas, comprensión lectora, gramática y redacción.</p>
+                        </div>
+                        <button onclick="startCategorySession('Lengua Española', 'Dame 5 reglas de ortografía esenciales explicadas de forma entretenida.')" class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Explorar Lengua
+                        </button>
+                    </div>
+
+                    <!-- Category Card 4 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-amber-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-landmark"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Historia Universal</h3>
+                            <p class="text-xs text-slate-500 mt-1">Grandes civilizaciones, eventos históricos y personajes relevantes.</p>
+                        </div>
+                        <button onclick="startCategorySession('Historia', 'Cuéntame la historia de una antigua civilización como si fuera un cuento de aventuras.')" class="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Explorar Historia
+                        </button>
+                    </div>
+
+                    <!-- Category Card 5 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-purple-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-lightbulb"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Técnicas de Estudio</h3>
+                            <p class="text-xs text-slate-500 mt-1">Método Pomodoro, mapas mentales, síntesis y preparación de exámenes.</p>
+                        </div>
+                        <button onclick="startCategorySession('Técnicas de Estudio', 'Dame la mejor guía paso a paso para crear un mapa mental efectivo.')" class="w-full bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Explorar Técnicas
+                        </button>
+                    </div>
+
+                    <!-- Category Card 6 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 hover:border-jurany-300 hover:shadow-md transition bg-gradient-to-br from-white to-rose-50/30 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">Cuestionarios y Quizzes</h3>
+                            <p class="text-xs text-slate-500 mt-1">Desafía tus conocimientos con trivias rápidas interactuando con Jurany.</p>
+                        </div>
+                        <button onclick="startCategorySession('Quiz Interactivo', 'Crea un quiz interactivo de 4 preguntas de opción múltiple de cultura general. No me des las respuestas de inmediato.')" class="w-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold py-2.5 rounded-xl transition">
+                            Iniciar Quiz Interactivo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: RECOPILACIÓN DE DATOS (REGISTRO/FEEDBACK) -->
+        <section id="view-data" class="tab-content hidden flex-1 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-user text-amber-500"></i> Módulo de Recopilación de Datos
+                    </h2>
+                    <p class="text-slate-500 text-sm">Registra a estudiantes o docentes para personalizar las sesiones de JuranyEnseña y guardar el historial de aprendizaje.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Form -->
+                    <div class="lg:col-span-5 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <h3 class="font-display font-bold text-base text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-jurany-500"></i> Nuevo Registro de Usuario
+                        </h3>
+                        <form id="data-collection-form" onsubmit="saveUserData(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nombre Completo</label>
+                                <input type="text" id="user-name" required placeholder="Ej: Maria Lucía Pérez" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Correo Electrónico / Contacto</label>
+                                <input type="email" id="user-email" required placeholder="correo@ejemplo.com" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Rol</label>
+                                    <select id="user-role" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                                        <option value="Estudiante">Estudiante</option>
+                                        <option value="Docente">Docente</option>
+                                        <option value="Padre de Familia">Padre / Tutor</option>
+                                        <option value="General">Otro</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nivel Educativo</label>
+                                    <select id="user-level" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                                        <option value="Primaria">Primaria</option>
+                                        <option value="Secundaria">Secundaria</option>
+                                        <option value="Bachillerato">Bachillerato</option>
+                                        <option value="Universidad">Universidad</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Materia de Interés Principal</label>
+                                <input type="text" id="user-interest" placeholder="Ej: Biología o Álgebra" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                            </div>
+
+                            <button type="submit" class="w-full bg-jurany-500 hover:bg-jurany-600 text-white font-semibold py-3 rounded-xl shadow-md shadow-jurany-200 transition text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Datos
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Registered Table & Export -->
+                    <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-display font-bold text-base text-slate-800">
+                                    Usuarios Registrados (<span id="user-count">0</span>)
+                                </h3>
+                                <button onclick="exportDataCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-xs">
+                                    <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                                </button>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs">
+                                <div class="max-h-80 overflow-y-auto custom-scrollbar">
+                                    <table class="w-full text-left text-xs text-slate-600">
+                                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase border-b border-slate-200">
+                                            <tr>
+                                                <th class="p-3">Nombre</th>
+                                                <th class="p-3">Rol</th>
+                                                <th class="p-3">Nivel</th>
+                                                <th class="p-3">Interés</th>
+                                                <th class="p-3 text-right">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="user-table-body" class="divide-y divide-slate-100">
+                                            <!-- Dynamic Rows -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-jurany-50 border border-jurany-200 p-4 rounded-2xl text-xs text-jurany-800 flex items-start gap-3">
+                            <i class="fa-solid fa-shield-halved text-jurany-500 text-lg mt-0.5"></i>
+                            <div>
+                                <p class="font-bold mb-0.5">Privacidad y Almacenamiento Local</p>
+                                <p>Los datos registrados se guardan en el navegador local (LocalStorage) para demostración segura sin envío a servidores externos imprevistos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CÓDIGO QR -->
+        <section id="view-qr" class="tab-content hidden flex-1 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div class="max-w-3xl mx-auto text-center space-y-6">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-qrcode text-emerald-500"></i> Generador de Código QR - JuranyEnseña
+                    </h2>
+                    <p class="text-slate-500 text-sm mt-1">Escanea o comparte el código QR para acceder rápidamente al chatbot en cualquier dispositivo móvil.</p>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 flex flex-col items-center justify-center space-y-4">
+                    <!-- QR Box -->
+                    <div id="qrcode-container" class="bg-white p-5 rounded-2xl border-2 border-jurany-300 shadow-md flex items-center justify-center">
+                        <!-- Dynamic Canvas/Img generated here -->
+                    </div>
+
+                    <div class="w-full max-w-sm space-y-3">
+                        <label class="block text-xs font-bold uppercase text-slate-600 text-left">URL o Texto Personalizado para el QR</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="qr-input-text" value="https://juranyenseña.edu" class="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-jurany-400 focus:outline-none">
+                            <button onclick="updateQRCode()" class="bg-jurany-500 hover:bg-jurany-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3 pt-2">
+                        <button onclick="downloadQR()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Descargar QR en Imagen
+                        </button>
+                        <button onclick="copyQRLink()" class="bg-jurany-100 hover:bg-jurany-200 text-jurany-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-copy"></i> Copiar Enlace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: AYUDA -->
+        <section id="view-help" class="tab-content hidden flex-1 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-blue-500"></i> Centro de Ayuda y Preguntas Frecuentes
+                    </h2>
+                    <p class="text-slate-500 text-sm">Aprende a sacarle el máximo provecho a la plataforma JuranyEnseña.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- FAQ 1 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <h3 class="font-display font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-jurany-500"></i> ¿Quién es Jurany?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Jurany es una inteligencia artificial diseñada con forma de T-Rex rosa profesora. Está optimizada para responder preguntas de nivel escolar y universitario de forma dinámica y empática.
+                        </p>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <h3 class="font-display font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-microphone text-emerald-500"></i> ¿Puedo dictar por voz?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            ¡Sí! Haz clic en el ícono del micrófono en la barra de chat para hablar. El sistema convertirá tu voz en texto automáticamente.
+                        </p>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <h3 class="font-display font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-qrcode text-purple-500"></i> ¿Para qué sirve el Código QR?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            El código QR permite compartir la aplicación en salones de clase o proyectores para que estudiantes escaneen y abran la app en sus teléfonos celulares.
+                        </p>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <h3 class="font-display font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download text-amber-500"></i> ¿Cómo exporto los datos guardados?
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            En la pestaña "Registro y Datos", puedes hacer clic en el botón "Exportar CSV" para descargar en formato Excel todos los estudiantes registrados.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Support Box -->
+                <div class="bg-gradient-to-r from-jurany-500 to-purple-600 p-6 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <h3 class="font-display font-bold text-lg">¿Tienes dudas adicionales o sugerencias?</h3>
+                        <p class="text-xs text-jurany-100">Estamos en constante evolución para brindar la mejor educación interactiva.</p>
+                    </div>
+                    <button onclick="sendQuickPrompt('Jurany, ¿cuáles son las mejores recomendaciones para utilizar este chatbot en mi aula de clase?')" class="bg-white text-jurany-700 hover:bg-jurany-50 font-bold text-xs px-5 py-3 rounded-2xl transition whitespace-nowrap shadow-md">
+                        Preguntar a Jurany por Consejos
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs z-50 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message">Mensaje de notificación</span>
+    </div>
+
+    <script>
+        /* Application State */
+        let usersData = [
+            { name: "Carlos Mendoza", email: "carlos@escuela.edu", role: "Estudiante", level: "Secundaria", interest: "Matemáticas" },
+            { name: "Lucía Fernández", email: "lucia.prof@colegio.edu", role: "Docente", level: "Primaria", interest: "Ciencias" }
+        ];
+
+        let qrInstance = null;
+        let isRecognizingSpeech = false;
+        let recognition = null;
+
+        /* Gemini AI System Prompt Setup */
+        const JURANY_SYSTEM_PROMPT = `
+        Eres "Jurany", una simpática T-Rex rosa, súper inteligente, divertida y didáctica. 
+        Tu objetivo es enseñar materias académicas (Matemáticas, Ciencias, Lengua, Historia, Geografía, etc.) a estudiantes y docentes.
+        Características de tus respuestas:
+        1. Tu tono es entusiasta, acogedor y motivador (usas expresiones como "¡RAAWR!", "¡Hola, futuro genio!", "¡Qué excelente pregunta!").
+        2. Explicas conceptos complejos con ejemplos simples, analogías creativas y emojis.
+        3. Si la pregunta es muy amplia, respondes con brevedad y propones un ejercicio o reto corto.
+        4. Siempre hablas en español correcto y claro.
+        `;
+
+        /* Initialization */
+        window.onload = function() {
+            // Load users from LocalStorage if available
+            const stored = localStorage.getItem('jurany_registered_users');
+            if (stored) {
+                try { usersData = JSON.parse(stored); } catch(e){}
+            }
+            renderUserTable();
+            initQRCode();
+            setupSpeechRecognition();
+        };
+
+        /* Switch UI Tabs */
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Unhighlight all nav buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-jurany-500', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+            document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+                btn.classList.remove('text-jurany-600', 'font-semibold');
+            });
+
+            // Show selected view
+            const targetView = document.getElementById(`view-${tabId}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            // Highlight Desktop Button
+            const targetBtn = document.getElementById(`nav-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.add('bg-jurany-500', 'text-white', 'shadow-sm');
+                targetBtn.classList.remove('text-slate-600');
+            }
+
+            // Highlight Mobile Button
+            const mobBtn = document.getElementById(`mob-${tabId}`);
+            if (mobBtn) {
+                mobBtn.classList.add('text-jurany-600', 'font-semibold');
+            }
+        }
+
+        /* Send User Message and Call Gemini API */
+        async function handleSendMessage(event) {
+            if (event) event.preventDefault();
+            const inputEl = document.getElementById('user-input');
+            const message = inputEl.value.trim();
+            if (!message) return;
+
+            // Render User Message
+            appendMessage('user', message);
+            inputEl.value = '';
+
+            // Show Typing Indicator
+            showTyping(true);
+
+            try {
+                // Fetch Gemini API response
+                const responseText = await callGeminiAPI(message);
+                showTyping(false);
+                appendMessage('jurany', responseText);
+            } catch (error) {
+                showTyping(false);
+                appendMessage('jurany', "¡RAAWR! 🦕 Ocurrió un pequeño problema al conectarme a mi cerebro de T-Rex. ¡Inténtalo de nuevo en un segundo!");
+                console.error("Gemini Error:", error);
+            }
+        }
+
+        /* Gemini API Call Implementation */
+        async function callGeminiAPI(userPrompt) {
+            const apiKey = ""; // Canvas runtime environment automatically provides authorization
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [{ text: userPrompt }]
+                    }
+                ],
+                systemInstruction: {
+                    parts: [{ text: JURANY_SYSTEM_PROMPT }]
+                }
+            };
+
+            let retries = 0;
+            const maxRetries = 3;
+            let delay = 1000;
+
+            while (retries < maxRetries) {
+                try {
+                    const res = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const candidate = data.candidates?.[0];
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            return candidate.content.parts[0].text;
+                        }
+                    }
+                } catch (e) {
+                    // Retry with exponential backoff
+                }
+                retries++;
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+
+            // Fallback response if fetch fails
+            return generateLocalFallbackResponse(userPrompt);
+        }
+
+        /* Local Smart Fallback */
+        function generateLocalFallbackResponse(prompt) {
+            const p = prompt.toLowerCase();
+            if (p.includes('hola') || p.includes('quien es')) {
+                return "¡RAAWR! 🦖 Soy Jurany, tu T-Rex mentora rosa. Estoy aquí para enseñarte matemáticas, literatura, ciencias e historia con la mejor energía.";
+            } else if (p.includes('fotosintesis') || p.includes('planta')) {
+                return "🌱 ¡La fotosíntesis es fascinante! Las plantas absorben luz solar, agua y dióxido de carbono para fabricar glucosa (su alimento) y liberar oxígeno fresco al aire. ¡Son verdaderas fábricas verdes!";
+            } else if (p.includes('matematica') || p.includes('multiplicar')) {
+                return "🔢 ¡Truco de T-Rex! Para multiplicar cualquier número de dos dígitos por 11 (ej: 25 x 11): suma los dos dígitos (2+5=7) y pon el resultado en el medio = 275. ¡Fácil y rápido!";
+            }
+            return "¡Excelente pregunta! Como T-Rex educadora, me encanta explorar ese tema. Para aprenderlo rápido, divídelo en 3 pasos principales: comprender la teoría, ver un ejemplo práctico y realizar un pequeño ejercicio.";
+        }
+
+        /* Append Message to Chat Window */
+        function appendMessage(sender, text) {
+            const container = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = sender === 'user' ? 'flex items-start gap-3 justify-end' : 'flex items-start gap-3 max-w-3xl';
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (sender === 'user') {
+                msgDiv.innerHTML = `
+                    <div class="bg-slate-800 text-white rounded-2xl rounded-tr-none p-4 shadow-xs max-w-xl space-y-1">
+                        <div class="flex items-center justify-between gap-4 border-b border-slate-700 pb-1">
+                            <span class="font-bold text-xs text-slate-300">Tú</span>
+                            <span class="text-[10px] text-slate-400">${timeStr}</span>
+                        </div>
+                        <p class="text-sm leading-relaxed">${escapeHTML(text)}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-slate-700 flex items-center justify-center text-white font-bold text-sm shrink-0 border-2 border-white shadow-sm">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="w-10 h-10 rounded-2xl bg-jurany-500 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0 border-2 border-white">
+                        🦖
+                    </div>
+                    <div class="chat-bubble-jurany rounded-2xl rounded-tl-none p-4 shadow-xs text-slate-800 space-y-2 max-w-2xl">
+                        <div class="flex items-center justify-between border-b border-jurany-200/60 pb-1">
+                            <span class="font-display font-bold text-jurany-700 text-sm">Jurany La T-Rex</span>
+                            <span class="text-[10px] text-jurany-500 font-medium">${timeStr}</span>
+                        </div>
+                        <div class="text-sm leading-relaxed whitespace-pre-line">${formatBotResponse(text)}</div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="readTextAloud(this)" data-text="${escapeHTML(text)}" class="text-xs text-jurany-600 hover:text-jurany-800 flex items-center gap-1 font-medium bg-white/70 px-2 py-1 rounded-lg border border-jurany-200">
+                                <i class="fa-solid fa-volume-high"></i> Escuchar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        /* Helpers for Chat Formatting */
+        function formatBotResponse(text) {
+            // Basic bold and list item formatting for clean UI
+            let formatted = escapeHTML(text)
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\* /g, '\n• ');
+            return formatted;
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function showTyping(show) {
+            const el = document.getElementById('typing-indicator');
+            if (show) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendQuickPrompt(promptText) {
+            switchTab('chat');
+            document.getElementById('user-input').value = promptText;
+            handleSendMessage();
+        }
+
+        function startCategorySession(categoryName, promptText) {
+            showToast(`Iniciando tema: ${categoryName}`, 'fa-shapes text-purple-400');
+            sendQuickPrompt(promptText);
+        }
+
+        function clearChatLog() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = `
+                <div class="flex items-start gap-3 max-w-3xl">
+                    <div class="w-10 h-10 rounded-2xl bg-jurany-500 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0 border-2 border-white">
+                        🦖
+                    </div>
+                    <div class="chat-bubble-jurany rounded-2xl rounded-tl-none p-4 shadow-xs text-slate-800 space-y-2">
+                        <div class="flex items-center justify-between border-b border-jurany-200/60 pb-1">
+                            <span class="font-display font-bold text-jurany-700 text-sm">Jurany La T-Rex</span>
+                            <span class="text-[10px] text-jurany-500 font-medium">Reiniciado</span>
+                        </div>
+                        <p class="text-sm leading-relaxed">
+                            ¡Chat reiniciado! 🦖✨ Estoy lista para una nueva pregunta. ¿En qué te puedo ayudar?
+                        </p>
+                    </div>
+                </div>
+            `;
+            showToast('Conversación reiniciada', 'fa-rotate-right text-jurany-400');
+        }
+
+        /* Read Text Aloud (Speech Synthesis) */
+        function readTextAloud(btn) {
+            const text = btn.getAttribute('data-text');
+            if (!('speechSynthesis' in window)) {
+                showToast('Tu navegador no soporta síntesis de voz', 'fa-triangle-exclamation text-amber-400');
+                return;
+            }
+            window.speechSynthesis.cancel(); // Stop any active audio
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.1; // Slightly higher pitch for playful T-Rex
+            window.speechSynthesis.speak(utterance);
+            showToast('Reproduciendo audio de Jurany...', 'fa-volume-high text-jurany-400');
+        }
+
+        /* Voice Speech-to-Text Input */
+        function setupSpeechRecognition() {
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.continuous = false;
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('user-input').value = transcript;
+                    toggleVoiceInput(false);
+                    showToast('Voz reconocida con éxito', 'fa-microphone text-emerald-400');
+                };
+
+                recognition.onerror = function() {
+                    toggleVoiceInput(false);
+                    showToast('Error de reconocimiento de voz', 'fa-microphone-slash text-rose-400');
+                };
+
+                recognition.onend = function() {
+                    toggleVoiceInput(false);
+                };
+            }
+        }
+
+        function toggleVoiceInput(forceState) {
+            if (!recognition) {
+                showToast('Reconocimiento de voz no soportado en este navegador', 'fa-info-circle text-blue-400');
+                return;
+            }
+            const micBtn = document.getElementById('mic-btn');
+            if (forceState === false || isRecognizingSpeech) {
+                recognition.stop();
+                isRecognizingSpeech = false;
+                micBtn.classList.remove('text-jurany-600', 'animate-pulse');
+                micBtn.classList.add('text-slate-400');
+            } else {
+                recognition.start();
+                isRecognizingSpeech = true;
+                micBtn.classList.add('text-jurany-600', 'animate-pulse');
+                micBtn.classList.remove('text-slate-400');
+                showToast('Escuchando tu voz...', 'fa-microphone text-jurany-400');
+            }
+        }
+
+        /* User Data Collection Functions */
+        function saveUserData(e) {
+            e.preventDefault();
+            const name = document.getElementById('user-name').value.trim();
+            const email = document.getElementById('user-email').value.trim();
+            const role = document.getElementById('user-role').value;
+            const level = document.getElementById('user-level').value;
+            const interest = document.getElementById('user-interest').value.trim() || 'General';
+
+            if (!name || !email) return;
+
+            const newUser = { name, email, role, level, interest };
+            usersData.unshift(newUser);
+
+            try {
+                localStorage.setItem('jurany_registered_users', JSON.stringify(usersData));
+            } catch(err) {}
+
+            renderUserTable();
+            document.getElementById('data-collection-form').reset();
+            showToast('¡Usuario registrado con éxito!', 'fa-circle-check text-emerald-400');
+        }
+
+        function renderUserTable() {
+            const tbody = document.getElementById('user-table-body');
+            const countEl = document.getElementById('user-count');
+            countEl.textContent = usersData.length;
+
+            if (usersData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No hay usuarios registrados aún.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = usersData.map((user, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-semibold text-slate-800">${escapeHTML(user.name)}</td>
+                    <td class="p-3"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">${escapeHTML(user.role)}</span></td>
+                    <td class="p-3">${escapeHTML(user.level)}</td>
+                    <td class="p-3">${escapeHTML(user.interest)}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="deleteUser(${idx})" class="text-rose-500 hover:text-rose-700 p-1" title="Eliminar registro">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteUser(index) {
+            usersData.splice(index, 1);
+            try {
+                localStorage.setItem('jurany_registered_users', JSON.stringify(usersData));
+            } catch(e){}
+            renderUserTable();
+            showToast('Registro eliminado', 'fa-trash text-rose-400');
+        }
+
+        function exportDataCSV() {
+            if (usersData.length === 0) {
+                showToast('No hay datos para exportar', 'fa-triangle-exclamation text-amber-400');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Nombre,Correo,Rol,Nivel,Interes\n";
+            usersData.forEach(u => {
+                csvContent += `"${u.name}","${u.email}","${u.role}","${u.level}","${u.interest}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "registros_jurany_enseña.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('CSV descargado con éxito', 'fa-file-csv text-emerald-400');
+        }
+
+        /* QR Code Generator */
+        function initQRCode() {
+            const container = document.getElementById("qrcode-container");
+            container.innerHTML = "";
+            const currentUrl = document.getElementById("qr-input-text").value || window.location.href;
+
+            qrInstance = new QRCode(container, {
+                text: currentUrl,
+                width: 180,
+                height: 180,
+                colorDark : "#db2777", // Jurany Pink Dark
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function updateQRCode() {
+            const text = document.getElementById("qr-input-text").value.trim();
+            if (!text) return;
+            const container = document.getElementById("qrcode-container");
+            container.innerHTML = "";
+            
+            qrInstance = new QRCode(container, {
+                text: text,
+                width: 180,
+                height: 180,
+                colorDark : "#db2777",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            showToast('Código QR actualizado', 'fa-qrcode text-emerald-400');
+        }
+
+        function downloadQR() {
+            const img = document.querySelector("#qrcode-container img") || document.querySelector("#qrcode-container canvas");
+            if (!img) return;
+
+            let imageURI = "";
+            if (img.tagName === "IMG") {
+                imageURI = img.src;
+            } else if (img.tagName === "CANVAS") {
+                imageURI = img.toDataURL("image/png");
+            }
+
+            const link = document.createElement("a");
+            link.download = "QR_JuranyEnsena.png";
+            link.href = imageURI;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Descargando imagen QR...', 'fa-download text-emerald-400');
+        }
+
+        function copyQRLink() {
+            const input = document.getElementById("qr-input-text");
+            input.select();
+            document.execCommand('copy');
+            showToast('Enlace copiado al portapapeles', 'fa-copy text-jurany-400');
+        }
+
+        /* Notification Toast Function */
+        function showToast(msg, iconClass = 'fa-circle-check text-emerald-400') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = msg;
+            toastIcon.className = `fa-solid ${iconClass} text-base`;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
